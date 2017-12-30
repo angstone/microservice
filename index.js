@@ -6,13 +6,9 @@ let micro = {};
 // default env
 micro.env = {
 
-  redis: {
-    host: 'redis',
-    port: 6379
-  },
-
   seneca_redis_config: {
-    ...this.redis,
+    host: 'redis',
+    port: 6379,
     type:'redis'
   },
 
