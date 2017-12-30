@@ -3,7 +3,20 @@
 
 let micro = {};
 
-micro.env = require('./env.js');
+// default env
+micro.env = {
+
+  redis: {
+    host: 'localhost',
+    port: 6379
+  },
+
+  seneca_redis_config: {
+    ...this.redis,
+    type:'redis'
+  },
+
+};
 
 micro.seneca = require('seneca')().use('seneca-redis-transport');
 //micro.env = require('../env.js');
