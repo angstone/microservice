@@ -7,7 +7,7 @@ let micro = {};
 micro.env = {
 
   redis: {
-    host: 'localhost',
+    host: 'redis',
     port: 6379
   },
 
