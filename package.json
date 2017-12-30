@@ -17,7 +17,7 @@
     "elasticsearch",
     "backend"
   ],
-  "author": "SS Ribeiro",
+  "author": "SS Ribeiro <luan@ssribeiro.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angstone/microservice/issues"
