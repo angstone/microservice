@@ -1,0 +1,30 @@
+{
+  "name": "@angstone/microservice",
+  "version": "0.0.0",
+  "description": "Default microservice package for angstone services.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/angstone/microservice.git"
+  },
+  "keywords": [
+    "microservice",
+    "seneca",
+    "eventstore",
+    "elasticsearch",
+    "backend"
+  ],
+  "author": "SS Ribeiro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angstone/microservice/issues"
+  },
+  "homepage": "https://github.com/angstone/microservice#readme",
+  "dependencies": {
+    "seneca": "~3.3.0",
+    "seneca-redis-transport": "~0.3.0"
+  }
+}
