@@ -1,20 +1,14 @@
 //const uuidv1 = require('uuid/v1');
 //const fetch = require('node-fetch');
 
-let micro = {};
+const micro = {};
 
 // default env
-micro.env = {
+micro.env = require('./lib/env.js');
 
-  seneca_redis_config: {
-    host: 'redis',
-    port: 6379,
-    type:'redis'
-  },
+micro.seneca = require('seneca')();
+micro.listen_pin_array = [];
 
-};
-
-micro.seneca = require('seneca')().use('seneca-redis-transport');
 //micro.env = require('../env.js');
 //micro.tagger = require('./tagger.js');
 //micro.evt = require('./evt.js').create(uuidv1, fetch, micro.env);
@@ -30,15 +24,56 @@ micro.seneca = require('seneca')().use('seneca-redis-transport');
     //procedure.start();
 //}
 
-micro.start = () => {
-  const cfg = micro.env.seneca_redis_config;
-  micro.seneca.client(cfg).listen(cfg);
-  return micro;
-};
-
 micro.useEnv = (env=null) => {
   if(env)
     micro.env = { ...micro.env, env};
+  return micro;
+};
+
+micro.consume = (pin) => {
+  micro.listen_pin_array.push({ pin });
+  return micro;
+};
+
+micro.observe = (pin) => {
+  micro.listen_pin_array.push({ pin, model: 'observe' });
+  return micro;
+};
+
+micro.setBase = (port=null) => {
+  micro.env.mesh_is_base = true;
+  if(port)
+    micro.env.mesh_port = port;
+  return micro;
+}
+
+micro.start = () => {
+
+  micro.seneca.use('consul-registry', {
+    host: micro.env.mesh_consul_registry_host
+  });
+
+  const cfg = {
+    isbase: micro.env.mesh_is_base,
+    discover: {
+      registry: {
+        active: true
+      },
+      multicast: {
+        active: false
+      }
+    }
+  };
+
+  if(micro.env.mesh_is_base) {
+    cfg.isbase = true;
+    cfg.port = micro.env.mesh_port;
+  }
+
+  if(micro.listen_pin_array.length > 0)
+    cfg.listen = micro.listen_pin_array;
+
+  micro.seneca.use('mesh', cfg);
   return micro;
 };
 
