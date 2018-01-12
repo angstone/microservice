@@ -1,13 +1,28 @@
+const Hemera = require("nats-hemera");
 //const uuidv1 = require('uuid/v1');
 //const fetch = require('node-fetch');
 
 const micro = {};
-
 // default env
 micro.env = require('./lib/env.js');
 
-micro.seneca = require('seneca')();
-micro.listen_pin_array = [];
+micro.create = (env=null) => {
+  if(env)
+    micro.env = { ...micro.env, env};
+
+  micro.hemera = new Hemera(
+    require("nats").connect({
+      'url': micro.env.nats_url,
+      'user': micro.env.nats_user,
+      'pass': process.env.nats_pw
+    }),
+    { logLevel: micro.env.hemera_logLevel }
+  );
+
+  micro.hemera_add_array = [];
+
+  return micro;
+};
 
 //micro.env = require('../env.js');
 //micro.tagger = require('./tagger.js');
@@ -24,56 +39,32 @@ micro.listen_pin_array = [];
     //procedure.start();
 //}
 
-micro.useEnv = (env=null) => {
-  if(env)
-    micro.env = { ...micro.env, env};
+//add
+// { topic: "math", cmd: "add" }, async function (resp) {
+//   return resp.a + resp.b
+// }
+micro.add = (pin, func) => {
+  micro.hemera_add_array.push({pin, func});
   return micro;
 };
 
-micro.consume = (pin) => {
-  micro.listen_pin_array.push({ pin });
-  return micro;
-};
+micro.start = (main=null) => {
+  micro.hemera.ready(async () => {
 
-micro.observe = (pin) => {
-  micro.listen_pin_array.push({ pin, model: 'observe' });
-  return micro;
-};
+    for(add_line of micro.hemera_add_array)
+      micro.hemera.add(add_line.pin, add_line.func);
 
-micro.setBase = (port=null) => {
-  micro.env.mesh_is_base = true;
-  if(port)
-    micro.env.mesh_port = port;
-  return micro;
-}
+    if(main)
+      main();
 
-micro.start = () => {
-
-  micro.seneca.use('consul-registry', {
-    host: micro.env.mesh_consul_registry_host
   });
+  return micro;
+};
 
-  const cfg = {
-    isbase: micro.env.mesh_is_base,
-    discover: {
-      registry: {
-        active: true
-      },
-      multicast: {
-        active: false
-      }
-    }
-  };
-
-  if(micro.env.mesh_is_base) {
-    cfg.isbase = true;
-    cfg.port = micro.env.mesh_port;
-  }
-
-  if(micro.listen_pin_array.length > 0)
-    cfg.listen = micro.listen_pin_array;
-
-  micro.seneca.use('mesh', cfg);
+//action
+// { topic: "math", cmd: "add", a: 1, b: 2 }
+micro.act = (action, cb) => {
+  micro.hemera.act(action, cb);
   return micro;
 };
 

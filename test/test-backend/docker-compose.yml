@@ -1,15 +1,26 @@
 version: '3'
 services:
 
-  redis:
-    image: redis:alpine
+  nats:
+    build:
+      context: "./nats"
+    expose:
+      - "4222"
     ports:
-      - "6379:6379"
+      - "4222:4222"
+      - "8222:8222"
 
   ping-service:
     build: ./ping-service
     volumes:
       - ../../:/home/node/app
+    depends_on:
+      - nats
+    restart: always
+    environment:
+      NATS_URL: nats://nats:4222
+      NATS_USER: nats_user
+      NATS_PW: nats_user_pw
 
   pong-service:
     build: ./pong-service

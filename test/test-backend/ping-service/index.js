@@ -1,12 +1,8 @@
-const micro = require('../../../index.js');
+const micro = require('../../../index.js').create();
 
-//micro.setBase();
-
-micro.start();
-
-micro.seneca.act('role:system, cmd:ping', (err, result) => {
-	if(err)
-		console.log(err);
-	else
+micro.start(()=>{
+	console.log('Deus Seja Louvado Em Todo Tempo!');
+	micro.act({topic: 'system', cmd: 'ping'}, (ans, result)=>{
 		console.log(result);
+	});
 });

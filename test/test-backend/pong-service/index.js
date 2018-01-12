@@ -1,11 +1,7 @@
-const micro = require('../../../index.js');
+const micro = require('../../../index.js').create();
 
-micro.setBase();
-
-micro.consume('role:system, cmd:ping');
-
-micro.seneca.add('role:system, cmd:ping', (args, callback) => {
-	callback(null, {result:'pong'});
-});
+micro.add({topic: 'system', cmd: 'ping'}, async (resp)=>{
+	return {result: 'pong'};
+})
 
 micro.start();

@@ -1,6 +1,6 @@
 {
   "name": "@angstone/microservice",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Default microservice package for angstone services.",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "keywords": [
     "microservice",
-    "seneca",
+    "hemera",
     "eventstore",
     "elasticsearch",
     "backend"
@@ -29,10 +29,7 @@
   },
   "dependencies": {
     "forever": "^0.15.3",
-    "seneca": "~3.3.0",
-    "seneca-balance-client": "^0.6.1",
-    "seneca-consul-registry": "^0.1.0",
-    "seneca-mesh": "^0.11.0",
-    "seneca-redis-transport": "~0.3.0"
+    "nats": "^0.7.24",
+    "nats-hemera": "^3.1.6"
   }
 }
