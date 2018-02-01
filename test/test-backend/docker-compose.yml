@@ -9,6 +9,7 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"
+      - "6222:6222"
 
   ping-service:
     build: ./ping-service

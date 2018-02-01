@@ -24,7 +24,43 @@ micro.create = (env=null) => {
   return micro;
 };
 
-//micro.env = require('../env.js');
+micro.mock = (req, cb, procedure, mocked_data) => {
+  if(micro.env.mock)
+    cb(null, mocked_data);
+  else
+    micro.procedures[procedure].start(req, cb);
+};
+
+micro.procedures = {};
+
+micro.addProcedures = (procedures) => {
+  procedures.forEach(procedure=>{
+    micro.addProcedure(procedure);
+  });
+  return micro;
+};
+
+micro.addProcedure = (proc) => {
+  // autocomplete config with defaults
+  if(proc.auto_add == null || proc.auto_add == undefined)
+    proc.auto_add = true;
+  if(proc.topic == null || proc.topic == undefined)
+    proc.topic = 'system';
+  if(proc.mocked == null || proc.mocked == undefined)
+    proc.mocked = { result: null };
+
+  micro.procedures[proc.name] = proc.procedure.create(proc.rules);
+
+  // auto add procedures
+  if(proc.auto_add) {
+    micro.add({topic: proc.topic, cmd: proc.name}, (req, cb) => {
+      return micro.mock(req, cb, proc.name, proc.mocked);
+    });
+  }
+
+  return micro;
+};
+
 //micro.tagger = require('./tagger.js');
 //micro.evt = require('./evt.js').create(uuidv1, fetch, micro.env);
 //micro.dispatcher = require('./dispatcher.js').create(micro.evt);
@@ -32,12 +68,7 @@ micro.create = (env=null) => {
 //micro.streamListener = require('./streamListener.js').create(micro.env, micro.eventStore);
 //micro.confirmer = require('./confirmer.js').create(micro.tagger, micro.streamListener);
 // simpler functions
-//micro.mock = (procedure, mocked) => {
-  //if(micro.env.MOCK)
-    //mocked();
-  //else
-    //procedure.start();
-//}
+
 
 //add
 // { topic: "math", cmd: "add" }, async function (resp) {
