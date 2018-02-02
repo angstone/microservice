@@ -60,3 +60,40 @@ const micro = require('@angstone/microservice').create().addProcedure({
   },
 }).start();
 ```
+operate-procedure.js
+```
+const operate_procedure = {
+
+  create: function(load) {
+    
+    // rules will be loaded at load.rules
+    // all modules loaded will be at load. example: dispatcher module will be this.load.dispatcher
+    this.load = load;    
+    
+    // perform extra steps as needed
+    return this;
+  },
+
+  start: function(req, cb) {
+  
+    // req.data will be the request data passed in the consume function
+    this.payload = req.data;
+
+    // pre-validate
+    // this.err = this.load.rules.pre_validation(this.op);
+    // if(this.err) return cb(this.err, null);
+
+    //authorize
+    //validate
+    //dispatch
+    
+    cb(null, {
+  		name: req.data.name,
+  		data: req.data.data
+  	});
+
+  },
+  
+};
+
+module.exports = signup_procedure;
