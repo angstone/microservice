@@ -75,23 +75,14 @@ const operate_procedure = {
   },
 
   start: function(req, cb) {
-  
-    // req.data will be the request data passed in the consume function
-    this.payload = req.data;
-
-    // pre-validate
+    // pre-validate sample
     // this.err = this.load.rules.pre_validation(this.op);
     // if(this.err) return cb(this.err, null);
-
-    //authorize
-    //validate
-    //dispatch
     
     cb(null, {
-  		name: req.data.name,
-  		data: req.data.data
-  	});
-
+      name: req.data.name, // req.data will be the request data passed in the consume function
+      data: req.data.data
+    });
   },
   
 };
