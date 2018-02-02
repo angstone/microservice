@@ -1,16 +1,7 @@
 const ping_procedure = {
 
-  create: function(ping_rules) {
-    //this.micro = micro;
-    this.ping_rules = ping_rules;
-    //this.req = req;
-    //this.cb = cb;
-    //this.op = {
-    //  type: 'ping',
-    //  stream: 'system',
-    //  payload: req,
-    //};
-    //this.err = false;
+  create: function(load) {
+    this.load = load;
     return this;
   },
 

@@ -6,6 +6,10 @@ const micro = {};
 // default env
 micro.env = require('./lib/env.js');
 
+micro.modules = {
+  dispatcher: () => { return require('./lib/dispatcher.js') },
+};
+
 micro.create = (env=null) => {
   if(env)
     micro.env = { ...micro.env, env};
@@ -42,14 +46,24 @@ micro.addProcedures = (procedures) => {
 
 micro.addProcedure = (proc) => {
   // autocomplete config with defaults
+  if(proc.rules == null || proc.rules == undefined)
+    proc.rules = null;
+  if(proc.loads == null || proc.loads == undefined)
+    proc.loads = [];
   if(proc.auto_add == null || proc.auto_add == undefined)
     proc.auto_add = true;
   if(proc.topic == null || proc.topic == undefined)
     proc.topic = 'system';
   if(proc.mocked == null || proc.mocked == undefined)
-    proc.mocked = { result: null };
+    proc.mocked = {};
 
-  micro.procedures[proc.name] = proc.procedure.create(proc.rules);
+  const loads = {};
+  loads.rules = proc.rules;
+  proc.loads.forEach(module=>{
+    loads[module] = micro.modules[module]();    
+  });
+
+  micro.procedures[proc.name] = proc.procedure.create(loads);
 
   // auto add procedures
   if(proc.auto_add) {
