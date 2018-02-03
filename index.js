@@ -1,19 +1,20 @@
-const Hemera = require("nats-hemera");
-//const uuidv1 = require('uuid/v1');
-//const fetch = require('node-fetch');
+//micro.tagger = require('./tagger.js');
+//micro.evt = require('./evt.js').create(uuidv1, fetch, micro.env);
+//micro.dispatcher = require('./dispatcher.js').create(micro.evt);
+//micro.eventStore = require('event-store-client');
+//micro.streamListener = require('./streamListener.js').create(micro.env, micro.eventStore);
+//micro.confirmer = require('./confirmer.js').create(micro.tagger, micro.streamListener);
+// simpler functions
 
+const Hemera = require("nats-hemera");
 const micro = {};
 // default env
 micro.env = require('./lib/env.js');
-
-micro.modules = {
-  dispatcher: () => { return require('./lib/dispatcher.js') },
-};
+micro.modules = require('./lib/modules');
 
 micro.create = (env=null) => {
   if(env)
     micro.env = { ...micro.env, env};
-
   micro.hemera = new Hemera(
     require("nats").connect({
       'url': micro.env.nats_url,
@@ -22,9 +23,7 @@ micro.create = (env=null) => {
     }),
     { logLevel: micro.env.hemera_logLevel }
   );
-
   micro.hemera_add_array = [];
-
   return micro;
 };
 
@@ -32,7 +31,7 @@ micro.mock = (req, cb, procedure, mocked_data) => {
   if(micro.env.mock)
     cb(null, mocked_data);
   else
-    micro.procedures[procedure].start(req, cb);
+    micro.procedures[procedure].run(req, cb);
 };
 
 micro.procedures = {};
@@ -44,47 +43,61 @@ micro.addProcedures = (procedures) => {
   return micro;
 };
 
-micro.addProcedure = (proc) => {
-  // autocomplete config with defaults
-  if(proc.rules == null || proc.rules == undefined)
-    proc.rules = null;
-  if(proc.loads == null || proc.loads == undefined)
-    proc.loads = [];
-  if(proc.auto_add == null || proc.auto_add == undefined)
-    proc.auto_add = true;
-  if(proc.topic == null || proc.topic == undefined)
-    proc.topic = 'system';
-  if(proc.mocked == null || proc.mocked == undefined)
-    proc.mocked = {};
+micro.addProcedure = (procedure) => {
+  procedure = micro.completeConfigForProcedure(procedure);
+  procedure = micro.loadModules(procedure);
 
-  const loads = {};
-  loads.rules = proc.rules;
-  proc.loads.forEach(module=>{
-    loads[module] = micro.modules[module]();    
-  });
-
-  micro.procedures[proc.name] = proc.procedure.create(loads);
-
-  // auto add procedures
-  if(proc.auto_add) {
-    micro.add({topic: proc.topic, cmd: proc.name}, (req, cb) => {
-      return micro.mock(req, cb, proc.name, proc.mocked);
-    });
-  }
+  micro.procedures[procedure.name] = procedure;
+  micro.autoAdd(procedure);
 
   return micro;
 };
 
-//micro.tagger = require('./tagger.js');
-//micro.evt = require('./evt.js').create(uuidv1, fetch, micro.env);
-//micro.dispatcher = require('./dispatcher.js').create(micro.evt);
-//micro.eventStore = require('event-store-client');
-//micro.streamListener = require('./streamListener.js').create(micro.env, micro.eventStore);
-//micro.confirmer = require('./confirmer.js').create(micro.tagger, micro.streamListener);
-// simpler functions
+// autocomplete config with defaults
+micro.completeConfigForProcedure = (procedure) => {
 
+  if(procedure.rules == null || procedure.rules == undefined)
+    procedure.rules = null;
 
-//add
+  if(procedure.load == null || procedure.load == undefined)
+    procedure.load = [];
+
+  if(procedure.auto_add == null || procedure.auto_add == undefined)
+    procedure.auto_add = true;
+
+  if(procedure.topic == null || procedure.topic == undefined)
+    procedure.topic = 'system';
+
+  if(procedure.mocked == null || procedure.mocked == undefined)
+    procedure.mocked = {};
+
+  return procedure;
+}
+
+micro.loadModules = (procedure) => {
+  if( procedure.load != undefined && procedure.load != null ) {
+    if( procedure.load instanceof Array ) {
+      const modules = {};
+      procedure.load.forEach( module_name => {
+        const module = micro.modules[module_name]();
+        modules[module_name] = micro.loadModules(module);
+      });
+      procedure.load = modules;
+    }
+  }
+  return procedure;
+};
+
+// auto add procedures
+micro.autoAdd = (procedure) => {
+  if(procedure.auto_add) {
+    micro.add({topic: procedure.topic, cmd: procedure.name}, (req, cb) => {
+      return micro.mock(req, cb, procedure.name, procedure.mocked);
+    });
+  }
+};
+
+// add
 // { topic: "math", cmd: "add" }, async function (resp) {
 //   return resp.a + resp.b
 // }
@@ -95,18 +108,15 @@ micro.add = (pin, func) => {
 
 micro.start = (main=null) => {
   micro.hemera.ready(async () => {
-
     for(add_line of micro.hemera_add_array)
       micro.hemera.add(add_line.pin, add_line.func);
-
     if(main)
       main();
-
   });
   return micro;
 };
 
-//action
+// action
 // { topic: "math", cmd: "add", a: 1, b: 2 }
 micro.act = (action, cb) => {
   micro.hemera.act(action, cb);

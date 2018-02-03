@@ -30,6 +30,8 @@
   "dependencies": {
     "forever": "^0.15.3",
     "nats": "^0.7.24",
-    "nats-hemera": "^3.1.6"
+    "nats-hemera": "^3.1.6",
+    "node-fetch": "^1.7.3",
+    "uuid": "^3.2.1"
   }
 }

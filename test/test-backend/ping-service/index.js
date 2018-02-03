@@ -24,7 +24,7 @@ micro.start(()=>{
 	});
 
 	// ping auto dispatcher
-	micro.act({topic: 'other', cmd: 'pingdispatcher'}, (ans, result)=>{
+	micro.act({topic: 'other', cmd: 'pingtoucher'}, (ans, result)=>{
 		console.log(result);
 	});
 

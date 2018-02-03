@@ -1,18 +1,27 @@
 const procedures = [
   {
     name: 'ping',
-    procedure: require('./ping-procedure.js'),
     auto_add: false,
+    run: (req, cb) => {
+      cb(null, {result: 'pong procedured'});
+    },
   },
   {
     name: 'pingautoprocedured',
-    procedure: require('./ping-procedure.js'),
+    run: function(req, cb) {
+      cb(null, {result: 'pong procedured'});
+    },
   },
   {
     topic: 'other',
-    name: 'pingdispatcher',
-    loads: ['dispatcher'],
-    procedure: require('./ping-dispatcher-procedure.js'),
+    name: 'pingtoucher',
+    load: ['toucher'],
+    run: function(req, cb) {
+      this.load.toucher.touch((err, res)=>{
+        if(err) cb(err, null);
+        cb(null, {result: 'pong '+res});
+      });
+    },
   },
 ];
 
