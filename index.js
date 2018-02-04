@@ -13,15 +13,22 @@ micro.env = require('./lib/env.js');
 micro.modules = require('./lib/modules');
 
 micro.create = (env=null) => {
+  // apply env merge
   if(env)
     micro.env = { ...micro.env, env};
+  // create env module injector
+  micro.modules.env = () => micro.env;
+  // create hemera instance
   micro.hemera = new Hemera(
     require("nats").connect({
       'url': micro.env.nats_url,
       'user': micro.env.nats_user,
       'pass': process.env.nats_pw
     }),
-    { logLevel: micro.env.hemera_logLevel }
+    {
+      logLevel: micro.env.hemera_logLevel,
+      timeout: micro.env.hemera_timeout,
+    }
   );
   micro.hemera_add_array = [];
   return micro;
@@ -85,6 +92,8 @@ micro.loadModules = (procedure) => {
       procedure.load = modules;
     }
   }
+  if( procedure.start != undefined && procedure.start != null )
+    procedure.start();
   return procedure;
 };
 

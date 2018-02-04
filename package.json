@@ -28,6 +28,7 @@
     "npm": "~5.5.1"
   },
   "dependencies": {
+    "event-store-client": "^1.0.0",
     "forever": "^0.15.3",
     "nats": "^0.7.24",
     "nats-hemera": "^3.1.6",

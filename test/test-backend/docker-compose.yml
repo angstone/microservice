@@ -11,6 +11,12 @@ services:
       - "8222:8222"
       - "6222:6222"
 
+  eventstore:
+    image: eventstore/eventstore:release-4.0.3
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+
   ping-service:
     build: ./ping-service
     volumes:
@@ -27,3 +33,26 @@ services:
     build: ./pong-service
     volumes:
       - ../../:/home/node/app
+    depends_on:
+      - nats
+
+  dispatch-confirm-ask-service:
+    build: ./dispatch-confirm-ask-service
+    volumes:
+      - ../../:/home/node/app
+    depends_on:
+      - nats
+      - eventstore
+    restart: always
+    environment:
+      NATS_URL: nats://nats:4222
+      NATS_USER: nats_user
+      NATS_PW: nats_user_pw
+
+  dispatch-confirm-res-service:
+    build: ./dispatch-confirm-res-service
+    volumes:
+      - ../../:/home/node/app
+    depends_on:
+      - nats
+      - eventstore

@@ -52,39 +52,32 @@ const micro = require('@angstone/microservice').create().addProcedure({
   topic: 'system', //optional default: system
   name: 'operate_pars',
   rules: require('../rules/operate_rules'), //optional default: null
-  load: ['dispatcher'], //optional default: []
-  procedure: require('./operate-procedure.js'),
+  load: ['toucher'], //optional default: []
+  run: function(req, cb) {
+    // pre-validate sample
+    // this.err = this.load.rules.pre_validation(this.op);
+    // if(this.err) return cb(this.err, null);
+
+    // the modules declared in load as string are automatic loaded
+    console.log(this.load.toucher.touch()); // the toucher module is for testing autoload utility
+
+    cb(null, {
+      name: req.data.name, // req.data will be the request data passed in the consume function
+      data: req.data.data
+    });
+  },
   mocked: { //optional default: null
     ans1: 'Mocked Ans1',
     ans2: '321'
   },
 }).start();
 ```
-operate-procedure.js
-```
-const operate_procedure = {
 
-  create: function(load) {
-    
-    // rules will be loaded at load.rules
-    // all modules loaded will be at load. example: dispatcher module will be this.load.dispatcher
-    this.load = load;    
-    
-    // perform extra steps as needed
-    return this;
-  },
+Notes for this commit:
 
-  start: function(req, cb) {
-    // pre-validate sample
-    // this.err = this.load.rules.pre_validation(this.op);
-    // if(this.err) return cb(this.err, null);
-    
-    cb(null, {
-      name: req.data.name, // req.data will be the request data passed in the consume function
-      data: req.data.data
-    });
-  },
-  
-};
+Added confirmer and dispatcher service.
 
-module.exports = signup_procedure;
+confirmer could not be tested yet.
+missing reducer service.
+
+dispatcher is okay.
