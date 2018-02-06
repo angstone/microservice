@@ -6,6 +6,5 @@ ENV NODE_ENV production
 VOLUME /home/node/app
 WORKDIR /home/node/app
 
-CMD sleep 15 \
- && $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/dispatch-confirm-ask-service/index.js \
+CMD $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/reducer-service/index.js \
  && tail -f ../.forever/*.log

@@ -11,23 +11,12 @@ services:
       - "8222:8222"
       - "6222:6222"
 
-  eventstore:
-    image: eventstore/eventstore:release-4.0.3
-    ports:
-      - "2113:2113"
-      - "1113:1113"
-
   ping-service:
     build: ./ping-service
     volumes:
       - ../../:/home/node/app
     depends_on:
       - nats
-    restart: always
-    environment:
-      NATS_URL: nats://nats:4222
-      NATS_USER: nats_user
-      NATS_PW: nats_user_pw
 
   pong-service:
     build: ./pong-service
@@ -36,6 +25,20 @@ services:
     depends_on:
       - nats
 
+  eventstore:
+    image: eventstore/eventstore:release-4.0.3
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+
+  reducer-service:
+    build: ./reducer-service
+    volumes:
+      - ../../:/home/node/app
+    depends_on:
+      - nats
+      - eventstore
+
   dispatch-confirm-ask-service:
     build: ./dispatch-confirm-ask-service
     volumes:
@@ -43,11 +46,7 @@ services:
     depends_on:
       - nats
       - eventstore
-    restart: always
-    environment:
-      NATS_URL: nats://nats:4222
-      NATS_USER: nats_user
-      NATS_PW: nats_user_pw
+      - reducer-service
 
   dispatch-confirm-res-service:
     build: ./dispatch-confirm-res-service
@@ -56,3 +55,4 @@ services:
     depends_on:
       - nats
       - eventstore
+      - reducer-service
