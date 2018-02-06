@@ -49,6 +49,20 @@ const procedures = [
       return cb(null, op);
     },
   },
+  {
+    topic: 'test',
+    name: 'dispatch_and_confirm_auto',
+    load: ['operator'],
+    run: function(req, cb) {
+      const op = {
+        type: 'dispatch_test',
+        stream: 'tests',
+        payload: req.data
+      };
+      //dispatch
+      this.load.operator.operate(op, cb);
+    }
+  },
 ];
 
 module.exports = procedures;
