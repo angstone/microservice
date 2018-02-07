@@ -16,6 +16,8 @@ micro.create = (env=null) => {
   // apply env merge
   if(env)
     micro.env = { ...micro.env, env};
+  // create this injector
+  micro.modules.micro = () => micro;
   // create env module injector
   micro.modules.env = () => micro.env;
   // create hemera instance
@@ -32,6 +34,11 @@ micro.create = (env=null) => {
   );
   micro.hemera_add_array = [];
   return micro;
+};
+
+micro.dev = (...objs) => {
+  if(micro.env.debug)
+    console.log(...objs);
 };
 
 micro.mock = (req, cb, procedure, mocked_data) => {
