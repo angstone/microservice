@@ -6,5 +6,6 @@ ENV NODE_ENV production
 VOLUME /home/node/app
 WORKDIR /home/node/app
 
-CMD $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/pong-service/index.js \
+CMD sleep 3 \
+ && $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/pong-service/index.js \
  && tail -f ../.forever/*.log

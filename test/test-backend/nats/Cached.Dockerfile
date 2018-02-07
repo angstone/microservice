@@ -7,9 +7,9 @@ ENV NATS_VERSION=0.9.6 \
     NATS_CLUSTER_TIMEOUT=2
 
 # Install gnatsd
-RUN apk add --update ca-certificates \
+RUN apk add --update --no-cache ca-certificates \
  && update-ca-certificates \
- && apk add openssl \
+ && apk add --no-cache openssl \
  && wget https://github.com/nats-io/gnatsd/releases/download/v${NATS_VERSION}/gnatsd-v${NATS_VERSION}-linux-386.zip \
  && unzip gnatsd-v${NATS_VERSION}-linux-386.zip \
  && mv gnatsd-v${NATS_VERSION}-linux-386/gnatsd /usr/bin/gnatsd \
@@ -28,7 +28,7 @@ RUN chmod 600 /etc/gnatsd.conf \
 # 4222: Client access port.
 # 8222: Management port.
 # 6222: Cluster port.
-EXPOSE 4222 8222 6222
+EXPOSE 4222 8222 6222 
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gnatsd", "-c", "/etc/gnatsd.conf"]
