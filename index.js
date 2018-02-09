@@ -17,7 +17,7 @@ micro.create = (env=null) => {
   if(env)
     micro.env = { ...micro.env, env};
   // create this injector
-  micro.modules.micro = () => micro;
+  micro.modules.micro = () => this;
   // create env module injector
   micro.modules.env = () => micro.env;
   // create hemera instance
@@ -120,6 +120,17 @@ micro.autoAdd = (procedure) => {
 micro.add = (pin, func) => {
   micro.hemera_add_array.push({pin, func});
   return micro;
+};
+
+micro.view = (what, cb) => {
+  micro.act({topic: 'view_'+what.in, cmd: 'take', data: what}, cb);
+};
+
+// function of what and callback
+micro.addView = (view, func) => {
+  micro.add({topic: 'view_'+view, cmd: 'take'}, (req, cb)=>{
+    return func(req.data, cb);
+  });
 };
 
 micro.start = (main=null) => {

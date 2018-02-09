@@ -56,3 +56,10 @@ services:
       - nats
       - eventstore
       - reducer-service
+
+  take-view-service:
+    build: ./take-view-service
+    volumes:
+      - ../../:/home/node/app
+    depends_on:
+      - nats
