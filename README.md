@@ -2,7 +2,7 @@
 
 Default microservice package for angstone services.
 
-You can use this to build microservice in a unbelievable easy way!
+You can use this to build microservice in an unbelievable easy way!
 
 Not ready for production!
 
@@ -15,25 +15,31 @@ Not ready for production!
 
 ## Engineering Aspects
 
-* It contains a eventstore and all data are event-sourced by default.
+* It contains 'eventstore' and all data are event-sourced by default.
 * It works like this:
 
-- An event is dispatch by your endpoint api.
+- An action is asked by your endpoint api.
 
-- The event get the auth information by the auth microservice.
+- The action get the auth information by the auth microservice.
 
-- The event is pre-filtered by dinamic business rules, which is writen in a separeted,
- file and is common to all microservices.
+- The action is pre-filtered by dinamic business rules.
+
+- The business rules are writen in a separated file and It is common to all microservices.
 
 - The event is dispatched to EventStore
 
-- The event walk throw the 'reducers' microservices. They translate the event in a set of changes to views
--- Note that the reducers take the business rules again to confirm the events, so the event is always double checked
- to improve reliability.
+- The event walk throw the 'confirmers' microservices. Note that the reducers take the business
+rules again to confirm the events, so the event is always double checked to improve reliability.
 
-- After applying change to views (database {Elastic Search}), a confirmation or error event is dispatched.
+- The confirmation or error event is dispatched.
 
 - The microservice than takes the confirmation or error and return to your endpoint api.
+
+- The confirmation event go to 'reducers'.
+
+- The reducers translate only the confirmed events in a set of changes in the database (Elastic Search).
+
+- The views are used to retrieve and querry data. They are consumed by your endpoint api's.
 
 * All modules must have its dependencies loaded in an exclusive entity.
 * All submodules has its dependencies loaded in an exclusive entity also ad infinitum.
