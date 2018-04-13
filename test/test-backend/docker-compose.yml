@@ -1,6 +1,12 @@
 version: '3'
 services:
 
+  eventstore:
+    image: eventstore/eventstore:release-4.0.3
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+
   nats:
     build:
       context: "./nats"
@@ -10,13 +16,15 @@ services:
       - "4222:4222"
       - "8222:8222"
       - "6222:6222"
+    depends_on:
+      - eventstore
 
   ping-service:
     build: ./ping-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
+      - pong-service
 
   pong-service:
     build: ./pong-service
@@ -25,41 +33,37 @@ services:
     depends_on:
       - nats
 
-  eventstore:
-    image: eventstore/eventstore:release-4.0.3
-    ports:
-      - "2113:2113"
-      - "1113:1113"
-
   reducer-service:
     build: ./reducer-service
     volumes:
       - ../../:/home/node/app
     depends_on:
       - nats
-      - eventstore
 
   dispatch-confirm-ask-service:
     build: ./dispatch-confirm-ask-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
-      - eventstore
-      - reducer-service
+      - dispatch-confirm-res-service
 
   dispatch-confirm-res-service:
     build: ./dispatch-confirm-res-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
-      - eventstore
-      - reducer-service
+      - ping-service
 
   take-view-service:
     build: ./take-view-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
+      - ping-service
+
+  test-db-service:
+    build: ./test-db-service
+    volumes:
+      - ../../:/home/node/app
+    depends_on:
+      - ping-service

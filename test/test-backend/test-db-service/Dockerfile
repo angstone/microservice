@@ -8,5 +8,5 @@ WORKDIR /home/node/app
 
 CMD sleep 2 \
  && rm -f ../.forever/*.log \
- && $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/pong-service/index.js \
+ && $(npm bin)/forever start -w --minUptime 10 --spinSleepTime 1000 test/test-backend/test-db-service/index.js \
  && tail -f ../.forever/*.log
