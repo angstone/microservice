@@ -5,6 +5,7 @@ Default microservice package for angstone services.
 You can use this to build microservice in an unbelievable easy way!
 
 Not ready for production!
+![alt text](https://github.com/angstone/microservice/blob/master/angstone_microservice_simple.jpg)
 
 ## Dependencies
 
