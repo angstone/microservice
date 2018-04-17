@@ -16,8 +16,8 @@ micro.create = (env=null) => {
   // apply env merge
   if(env)
     micro.env = { ...micro.env, env};
-  // create this injector
-  micro.modules.micro = () => this;
+  // create add injector
+  micro.modules.add = () => micro.add;
   // create env module injector
   micro.modules.env = () => micro.env;
   // create hemera instance
@@ -66,6 +66,30 @@ micro.addProcedure = (procedure) => {
 
   return micro;
 };
+
+micro.addReducers = (reducers) => {
+  micro.addProcedure({
+    name: 'reducer',
+    auto_add: false,
+    load: ['reducer'],
+    start: function() {
+      this.load.reducer.redux(reducers);
+    },
+  });
+  return micro;
+}
+
+micro.addRenders = (renders) => {
+  micro.addProcedure({
+    name: 'render',
+    auto_add: false,
+    load: ['render'],
+    start: function() {
+      this.load.render.renderize(renders);
+    },
+  });
+  return micro;
+}
 
 // autocomplete config with defaults
 micro.completeConfigForProcedure = (procedure) => {
@@ -123,14 +147,23 @@ micro.add = (pin, func) => {
 };
 
 micro.view = (what, cb) => {
+  if(!what.by)
+    what.by = 'id';
   micro.act({topic: 'view_'+what.in, cmd: 'take', data: what}, cb);
+  return micro;
 };
 
 // function of what and callback
 micro.addView = (view, func) => {
-  micro.add({topic: 'view_'+view, cmd: 'take'}, (req, cb)=>{
-    return func(req.data, cb);
+  micro.addProcedure({
+    name: 'views',
+    auto_add: false,
+    load: ['view'],
+    start: function() {
+      this.load.view.addView(view, func);
+    },
   });
+  return micro;
 };
 
 micro.start = (main=null) => {
@@ -146,6 +179,8 @@ micro.start = (main=null) => {
 // action
 // { topic: "math", cmd: "add", a: 1, b: 2 }
 micro.act = (action, cb) => {
+  if(!action.topic)
+    action.topic = "system";
   micro.hemera.act(action, cb);
   return micro;
 };

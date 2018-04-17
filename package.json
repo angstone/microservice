@@ -4,8 +4,13 @@
   "description": "Default microservice package for angstone services.",
   "main": "index.js",
   "scripts": {
-    "reborn": "./scripts/docker-reborn.sh test* test/test-backend",
-    "test": "cd test/test-backend && docker-compose up"
+    "clear": "./scripts/docker-remove.sh test*",
+    "reborn-backend": "./scripts/docker-reborn.sh test* test/test-backend",
+    "reborn-full-stack": "./scripts/docker-reborn.sh test* test/test-full-stack",
+    "reborn": "./scripts/docker-reborn.sh test* test/test-full-stack",
+    "test-backend": "cd test/test-backend && docker-compose up",
+    "test-full-stack": "cd test/test-full-stack && docker-compose up",
+    "test": "cd test/test-full-stack && docker-compose up"
   },
   "repository": {
     "type": "git",
@@ -29,6 +34,7 @@
     "npm": "~5.5.1"
   },
   "dependencies": {
+    "elasticsearch": "^14.2.2",
     "event-store-client": "^1.0.0",
     "forever": "^0.15.3",
     "nats": "^0.7.24",

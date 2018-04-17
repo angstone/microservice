@@ -54,7 +54,9 @@ rules again to confirm the events, so the event is always double checked to impr
 - dispatcher : dispatch the events.
 - streamListener : listen to events.
 - confirmer : take events confirmeds by reducers.
-- reducer : utility to make reducers (take the event and perform changes in DB following business rules).
+- reducer : utility to make reducers (take the event and perform confirm based on business rules and updated views).
+- render: utility to make renders (take the event and perform changes in DB following business rules and using the updated views).
+- db: Allow access to elasticsearch in a easy way (used by the views).
 - view : utility to create a view (querry data from DB).
 - operator : shortcut to perform the dispatch and confirmation operation.
 
@@ -76,12 +78,18 @@ If you want to perform tests or work in this project you need to grant the scrip
 
 ```npm test```
 
+```npm run test``` or  ```npm run test-full-stack```
+
+```npm run test-backend```
+
+
 * 'DISPATCH AND FAIL ERROR' is normal because It is supposed to do exactly this (FAIL).
 
 If you change the backend testing dockers or get troubles with the second time
 you  perform 'npm test' you may want to use:
 
 ```npm run reborn```
+```npm run reborn-backend```
 
 ## Usage
 

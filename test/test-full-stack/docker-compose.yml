@@ -50,19 +50,19 @@ services:
       - elasticsearch
       - elasticsearch2
 
-  ping-service:
-    build: ./ping-service
+  ask-creation-service:
+    build: ./ask-creation-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - pong-service
+      - serve-creation-service
 
-  pong-service:
-    build: ./pong-service
+  serve-creation-service:
+    build: ./serve-creation-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
+      - reducer-service
 
   reducer-service:
     build: ./reducer-service
@@ -71,33 +71,19 @@ services:
     depends_on:
       - nats
 
-  dispatch-confirm-ask-service:
-    build: ./dispatch-confirm-ask-service
+  render-service:
+    build: ./render-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - dispatch-confirm-res-service
+      - nats
 
-  dispatch-confirm-res-service:
-    build: ./dispatch-confirm-res-service
+  users-view-service:
+    build: ./users-view-service
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - ping-service
-
-  #take-view-service:
-  #  build: ./take-view-service
-  #  volumes:
-  #    - ../../:/home/node/app
-  #  depends_on:
-  #    - ping-service
-
-  test-db-service:
-    build: ./test-db-service
-    volumes:
-      - ../../:/home/node/app
-    depends_on:
-      - ping-service
+      - nats
 
 volumes:
   esdata1:
