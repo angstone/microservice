@@ -12,7 +12,7 @@ micro.start(()=>{
 	setInterval(()=>{
 
 		console.log('Asking user creation..');
-		micro.act({ topic: 'users', cmd: 'create', data: dummy_person }, (err, res)=>{
+		micro.act({ resource: 'users', action: 'create', data: dummy_person }, (err, res)=>{
 			if(err) {
 				console.log('CREATION ERROR:');
 				console.log(err.message);
@@ -24,7 +24,7 @@ micro.start(()=>{
 				console.log('ASKING INFORMATION ABOUT JUST ADDED USER VIA USER VIEW AFTER 10 SECONDS');
 
 				setTimeout(()=>{
-					micro.view({in:'users', id: res.evt.eventNumber}, (err, res) => {
+					micro.view({resource:'users', id: res.evt.eventNumber}, (err, res) => {
 						if(err) {
 							console.log('VIEW USER ERROR:');
 							console.log(err);

@@ -68,27 +68,54 @@ micro.addProcedure = (procedure) => {
 };
 
 micro.addReducers = (reducers) => {
+  const reducers_mod = reducers.map( reducer => {
+    reducer.stream = reducer.stream || reducer.resource;
+    reducer.type = reducer.type || reducer.action;
+    return reducer;
+  });
   micro.addProcedure({
     name: 'reducer',
     auto_add: false,
     load: ['reducer'],
     start: function() {
-      this.load.reducer.redux(reducers);
+      this.load.reducer.redux(reducers_mod);
     },
   });
   return micro;
 }
 
 micro.addRenders = (renders) => {
+  const renders_mod = renders.map( render => {
+    render.stream = render.stream || render.resource;
+    render.type = render.type || render.action;
+    return render;
+  });
   micro.addProcedure({
     name: 'render',
     auto_add: false,
     load: ['render'],
     start: function() {
-      this.load.render.renderize(renders);
+      this.load.render.renderize(renders_mod);
     },
   });
   return micro;
+}
+
+micro.addOperator = (operator) => {
+  return micro.addProcedure({
+  	topic: operator.resource,
+  	name: operator.action,
+  	load: ['operator'],
+  	run: function(req, cb) {
+  		const op = {
+  			stream: operator.resource,
+  			type: operator.action,
+  			payload: req.data
+  		};
+  		// operate event
+  		this.load.operator.operate(op, cb);
+  	}
+  });
 }
 
 // autocomplete config with defaults
@@ -147,6 +174,8 @@ micro.add = (pin, func) => {
 };
 
 micro.view = (what, cb) => {
+  if(!what.in)
+    what.in = what.resource;
   if(!what.by)
     what.by = 'id';
   micro.act({topic: 'view_'+what.in, cmd: 'take', data: what}, cb);
@@ -166,6 +195,19 @@ micro.addView = (view, func) => {
   return micro;
 };
 
+micro.addViews = (views) => {
+  views.forEach(view => {
+    micro.addView(view.resource, function(pars, db, cb) {
+      const sight = view.sights[pars.by];
+      if(!sight)
+        cb('INTERNAL ERROR: UNKNOWN WAY OF VIEW', null);
+      else
+        sight(pars, db, cb);
+    });
+  });
+  return micro;
+};
+
 micro.start = (main=null) => {
   micro.hemera.ready(async () => {
     for(add_line of micro.hemera_add_array)
@@ -180,7 +222,9 @@ micro.start = (main=null) => {
 // { topic: "math", cmd: "add", a: 1, b: 2 }
 micro.act = (action, cb) => {
   if(!action.topic)
-    action.topic = "system";
+    action.topic = action.resource || 'system';
+  if(!action.cmd)
+    action.cmd = action.action;
   micro.hemera.act(action, cb);
   return micro;
 };

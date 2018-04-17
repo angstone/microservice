@@ -3,10 +3,10 @@ const micro = require('../../../index.js').create();
 //  - Reducer for user'
 micro.addRenders([
 	{
-		stream: 'users',
-    type: 'create',
-    run: function(event, cb) {
-			this.load.db.index({
+		resource: 'users',
+    action: 'create',
+    run: function(event, db, cb) {
+			db.index({
 		    table: 'users',
 		    id: event.eventNumber,
 		    data: event.data
