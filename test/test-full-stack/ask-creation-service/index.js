@@ -24,7 +24,7 @@ micro.start(()=>{
 				console.log('ASKING INFORMATION ABOUT JUST ADDED USER VIA USER VIEW AFTER 10 SECONDS');
 
 				setTimeout(()=>{
-					micro.view({resource:'users', id: res.evt.eventNumber}, (err, res) => {
+					micro.view({resource:'users', id: res.id}, (err, res) => {
 						if(err) {
 							console.log('VIEW USER ERROR:');
 							console.log(err);
