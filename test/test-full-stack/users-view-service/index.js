@@ -2,13 +2,11 @@
 const micro = require('../../../index.js').create();
 
 micro.addViews([{
-	resource: 'users',
+	models: ['user'],
+	vent: ['users'],
 	sights: {
-		id: function(pars, db, cb) {
-			db.get({
-				table: 'users',
-				id: pars.id
-			}, cb);
+		id: function(pars, models, cb) {
+			models.user.create().findOne({ _id: pars.id }, cb);
 		}
 	}
 }]).start();

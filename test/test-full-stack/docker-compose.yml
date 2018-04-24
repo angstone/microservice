@@ -6,35 +6,33 @@ services:
     ports:
       - "2113:2113"
       - "1113:1113"
+    logging:
+      driver: "none"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.3
+  mongodb:
+    image: mongo:latest
     environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata1:/usr/share/elasticsearch/data
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    #volumes:
+    #  - ./mongo_data:/data/db
     ports:
-      - 9200:9200
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
 
-  elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.3
+  mongoexpress:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    #restart: always
+    #mem_limit: 128m
     environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.zen.ping.unicast.hosts=elasticsearch"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata2:/usr/share/elasticsearch/data
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    #command: sh -c 'sleep 10 && tini -- node app'
+    depends_on:
+      - mongodb
+    logging:
+      driver: "none"
 
   nats:
     build:
@@ -47,8 +45,9 @@ services:
       - "6222:6222"
     depends_on:
       - eventstore
-      - elasticsearch
-      - elasticsearch2
+      - mongodb
+    logging:
+      driver: "none"
 
   ask-creation-service:
     build: ./ask-creation-service
@@ -61,6 +60,9 @@ services:
     build: ./serve-creation-service
     volumes:
       - ../../:/home/node/app
+    environment:
+      - MODELS=./test/test-full-stack/models
+      - RULES=./test/test-full-stack/rules
     depends_on:
       - reducer-service
 
@@ -69,12 +71,15 @@ services:
     volumes:
       - ../../:/home/node/app
     depends_on:
-      - nats
+      - render-service
 
   render-service:
     build: ./render-service
     volumes:
       - ../../:/home/node/app
+    environment:
+      - MODELS=./test/test-full-stack/models
+      - RULES=./test/test-full-stack/rules
     depends_on:
       - nats
 
@@ -82,11 +87,8 @@ services:
     build: ./users-view-service
     volumes:
       - ../../:/home/node/app
+    environment:
+      - MODELS=./test/test-full-stack/models
+      - RULES=./test/test-full-stack/rules
     depends_on:
-      - nats
-
-volumes:
-  esdata1:
-    driver: local
-  esdata2:
-    driver: local
+      - render-service

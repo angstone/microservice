@@ -2,6 +2,5 @@ const micro = require('../../../index.js').create();
 
 //  - Serve user creation'
 micro.addOperator({
-	resource: 'users',
-	action: 'create'
+	action: 'user_create'
 }).start();
