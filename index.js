@@ -1,13 +1,13 @@
 const Hemera = require("nats-hemera");
 const micro = {};
 
-micro.appRoot = require('app-root-path');
 micro.procedures = {};
 micro.hemera_add_array = [];
 micro.env = require('./lib/env.js');
 micro.modules = require('./lib/modules');
 
-micro.add = (resource, action, func) => {
+micro.add = (resource, action, func=null) => {
+  if(func==null) { func = action; action = resource; resource = 'system'; }
   micro.hemera_add_array.push({resource, action, func});
   return micro;
 };
