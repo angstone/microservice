@@ -1,6 +1,6 @@
 {
   "name": "@angstone/microservice",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Default microservice package for angstone services.",
   "main": "index.js",
   "scripts": {
