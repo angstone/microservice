@@ -107,11 +107,36 @@ micro.addOperator = (operator) => {
         this.rules.validation(op, (err, validation)=>{
           if(err) cb(this.load.error(err));
           else if(validation) cb(this.load.error(validation));
-          else this.load.operator.operate(op, cb);
+          else this.includeInOp(op, cb);
+          //else this.load.operator.operate(op, cb);
         });
       } else {
-        this.load.operator.operate(op, cb);
+        this.includeInOp(op, cb);
+        //this.load.operator.operate(op, cb);
       }
+    },
+    includeInOp: function(op, cb) {
+      if(this.rules.includeInOp) {
+        this.rules.includeInOp(op, (err, include)=>{
+          if(err) cb(err);
+          else {
+            op.data.include = include;
+            this.load.operator.operate(op, (_err, _res)=>{
+              if(_err) cb(_err);
+              else this.respond(op, _res, cb);
+            });
+          }
+        });
+      } else {
+        this.load.operator.operate(op, (_err, _res)=>{
+          if(_err) cb(_err);
+          else this.respond(op, _res, cb);
+        });
+      }
+    },
+    respond: function(op, res, cb) {
+      if(this.rules.respondWith) this.rules.respondWith(op, cb);
+      else cb(null, res);
     },
   });
 };

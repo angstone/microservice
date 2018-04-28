@@ -35,9 +35,9 @@
     "app-root-path": "^2.0.1",
     "event-store-client": "^1.0.0",
     "forever": "^0.15.3",
-    "mongoose": "^5.0.15",
-    "nats": "^0.7.24",
-    "nats-hemera": "^3.1.6",
+    "mongoose": "^5.0.16",
+    "nats": "^0.7.29",
+    "nats-hemera": "^3.5.1",
     "node-fetch": "^1.7.3",
     "uuid": "^3.2.1"
   }

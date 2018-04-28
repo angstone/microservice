@@ -51,4 +51,18 @@ rules.validation = function(op, cb) {
   });
 };
 
+rules.includeInOp = function(op, cb) {
+  cb(null, {token:'123Token321'});
+};
+
+rules.respondWith = function(op, cb) {
+  setTimeout(()=>{
+    this.models.user.create(op.data).findByLogin((err, taken)=>{
+      if(err) cb('INTERNAL ERROR');
+      else if(taken) cb(null, taken);
+      else cb(null, null);
+    });
+  }, 900);
+};
+
 module.exports = rules;

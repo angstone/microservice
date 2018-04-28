@@ -17,9 +17,9 @@ const micro = require('../../../index.js').create().start(()=>{
 			else {
 				console.log('CREATION SUCCESS:');
 				console.log(res);
-				console.log('ASKING INFORMATION ABOUT JUST ADDED USER VIA USER VIEW AFTER 10 SECONDS');
+				console.log('ASKING INFORMATION ABOUT JUST ADDED USER VIA USER VIEW AFTER 2 SECONDS');
 				setTimeout(()=>{
-					micro.view({vent:'users', id: res.id}, (err, res) => {
+					micro.view({vent:'users', id: res.id || res._id}, (err, res) => {
 						if(err) {
 							console.log('VIEW USER ERROR:');
 							console.log(err);
@@ -29,8 +29,8 @@ const micro = require('../../../index.js').create().start(()=>{
 							console.log(res);
 						}
 					});
-				}, 1000);
+				}, 2000);
 			}
 		});
-	}, 5000);
+	}, 10000);
 });
