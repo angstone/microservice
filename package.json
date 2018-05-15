@@ -4,11 +4,15 @@
   "description": "Default microservice package for angstone services.",
   "main": "index.js",
   "scripts": {
+    "start": "cd test/test-full-stack && docker-compose up",
     "clear": "./scripts/docker-remove.sh test*",
     "reborn-full-stack": "./scripts/docker-reborn.sh test* test/test-full-stack",
+    "reborn-auth": "./scripts/docker-reborn.sh test* test/test-auth",
     "reborn": "./scripts/docker-reborn.sh test* test/test-full-stack",
+    "test-auth": "cd test/test-auth && docker-compose up",
     "test-full-stack": "cd test/test-full-stack && docker-compose up",
-    "test": "cd test/test-full-stack && docker-compose up"
+    "test": "cd test/test-full-stack && docker-compose up",
+    "solve-enosp": "./scripts/solve-esp.sh"
   },
   "repository": {
     "type": "git",
@@ -32,13 +36,13 @@
     "npm": "~5.5.1"
   },
   "dependencies": {
-    "app-root-path": "^2.0.1",
+    "app-root-path": "^2.0.0",
     "event-store-client": "^1.0.0",
     "forever": "^0.15.3",
-    "mongoose": "^5.0.16",
-    "nats": "^0.7.29",
-    "nats-hemera": "^3.5.1",
-    "node-fetch": "^1.7.3",
+    "mongoose": "^5.1.1",
+    "nats": "^0.8.10",
+    "nats-hemera": "^5.4.7",
+    "node-fetch": "^2.1.2",
     "uuid": "^3.2.1"
   }
 }

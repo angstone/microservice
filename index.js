@@ -1,4 +1,5 @@
 const Hemera = require("nats-hemera");
+const MicroError = Hemera.createError("Microservice Error");
 const micro = {};
 
 micro.procedures = {};
@@ -118,18 +119,18 @@ micro.addOperator = (operator) => {
     includeInOp: function(op, cb) {
       if(this.rules.includeInOp) {
         this.rules.includeInOp(op, (err, include)=>{
-          if(err) cb(err);
+          if(err) cb(this.load.error(err));
           else {
             op.data.include = include;
             this.load.operator.operate(op, (_err, _res)=>{
-              if(_err) cb(_err);
+              if(_err) cb(this.load.error(_err));
               else this.respond(op, _res, cb);
             });
           }
         });
       } else {
         this.load.operator.operate(op, (_err, _res)=>{
-          if(_err) cb(_err);
+          if(_err) cb(this.load.error(_err));
           else this.respond(op, _res, cb);
         });
       }
@@ -236,7 +237,7 @@ micro.addView = (vent, func) => {
   micro.add('view_'+vent,'take',(req, cb)=>{
     const what = req.data;
     if(!what.by)
-      what.by = 'id';
+      what.by = 'all';
     return func(what, cb);
   });
   return micro;
@@ -247,7 +248,7 @@ micro.addViews = (views) => {
     const models = view.models ? micro.lookForModels(view.models) : null;
     micro.addView(view.vent, function(pars, cb) {
       const sight = view.sights[pars.by];
-      if(!sight) cb('INTERNAL ERROR: UNKNOWN WAY OF VIEW', null);
+      if(!sight) cb(new MicroError('INTERNAL ERROR: UNKNOWN WAY OF VIEW'), null);
       else sight(pars, models, cb);
     });
   });
@@ -264,8 +265,10 @@ micro.act = (task, cb) => {
 };
 
 micro.view = (what, cb) => {
-  if(!what.by)
-    what.by = 'id';
+  if(!what.by) {
+    if(what.id) what.by = 'id';
+    else what.by = 'all';
+  }
   micro.act({resource: 'view_'+what.vent, action: 'take', data: what}, cb);
   return micro;
 };
@@ -296,7 +299,7 @@ micro.create = (env=null) => {
 micro.start = (main=null) => {
   micro.hemera.ready(async () => {
     for(add_line of micro.hemera_add_array)
-      micro.hemera.add({topic: add_line.resource, cmd: add_line.action}, add_line.func);
+      micro.hemera.add({topic: add_line.resource, cmd: add_line.action, timeout$: micro.env.hemera_message_timeout, expectedMessages$: 1}, add_line.func);
     if(main)
       main();
   });
