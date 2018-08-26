@@ -1,0 +1,42 @@
+@startuml
+title Auth Service For Angstone
+boundary restportal
+box "microservice"
+participant index << (I,#ADD1B2) >>
+control rules << (B,#ADD1B2) >>
+participant reducer << (R,#ADD1B2) >>
+entity model << (M,#ADD1B2) >>
+database inMemoryOrm << (D,#ADD1B2) >>
+end box
+database eventstore
+== Signup ==
+restportal -> index : signup (fulano)
+index -> rules : can system signup (fulano)?
+rules -> model : who are users?
+model -> inMemoryOrm : help me remember about the users
+inMemoryOrm -> model : users
+model -> rules : this is the users list
+alt yes he can
+rules -> index: yes he does not exist
+index -> eventstore: action done by (system) create (fulano)
+eventstore -> index : event confirmed
+eventstore -> reducer : got event
+reducer -> model : what is the users state?
+model -> inMemoryOrm : help me to remember users state?
+inMemoryOrm -> model : this is the users state
+model -> reducer : users state
+reducer -> model : new users state
+model -> inMemoryOrm : remember this new users state!
+reducer -> index : i am up to date with events
+index -> rules: whats is the result of the action?
+rules -> model : who are the new user?
+model -> inMemoryOrm : help me remember about the new user
+inMemoryOrm -> model : user
+model -> rules : this is the user
+rules -> index : that is the user created
+index -> restportal : the user token for fulano session
+else no he can't
+rules -> index: due to already exists
+index -> restportal: unauthorized error: already exists
+end
+@enduml

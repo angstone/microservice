@@ -1,0 +1,38 @@
+@startuml
+title Microservice For Angstone
+boundary command
+box "microservice"
+participant commander_new_instance << (I,#ADD1B2) >>
+control ruler_new_instance << (B,#ADD1B2) >>
+database modeler_singleton << (D,#ADD1B2) >>
+participant dispatcher_singleton << (D,#ADD1B2) >>
+participant reducer_new_instance << (R,#ADD1B2) >>
+end box
+== Boot Time ==
+reducer_new_instance -> modeler_singleton : user_model_update_stream$
+reducer_new_instance -> modeler_singleton : session_model_update_stream$
+command -> commander_new_instance : add command 'signup' with 'signup_rules_sheet witch depends on models'
+commander_new_instance -> ruler_new_instance : load 'signup_rules_sheet witch depends on user and session models'
+ruler_new_instance -> modeler_singleton : get models user and session'
+modeler_singleton -> ruler_new_instance : user and session models
+ruler_new_instance -> commander_new_instance : the signup_rules_loaded with user and session models
+commander_new_instance -> command : 'signup command with signup_rules_loaded with user and session models loaded ready'
+== Command Operations ==
+command -> commander_new_instance : signup user_data
+commander_new_instance -> ruler_new_instance : pre_validade user_data
+ruler_new_instance -> commander_new_instance : false(meaning valid) or reason
+commander_new_instance -> ruler_new_instance : validate user_data
+ruler_new_instance -> modeler_singleton : help-me decide with data
+modeler_singleton -> ruler_new_instance : data
+ruler_new_instance -> commander_new_instance : valid or rule_break
+commander_new_instance -> ruler_new_instance : what should I respond?
+ruler_new_instance -> commander_new_instance : you should respond with session_data witch needs session_model_update_stream event about user_data_stored witch needs user_model_update_stream and should match given user_data
+commander_new_instance -> dispatcher_singleton : dispatch signup user_data
+reducer_new_instance -> modeler_singleton : user_model_update_stream$ emited user_data
+reducer_new_instance -> modeler_singleton : session_model_update_stream$ emited session_data
+modeler_singleton -> ruler_new_instance : user_data emited
+ruler_new_instance -> commander_new_instance : user_data emited
+modeler_singleton -> ruler_new_instance : session_data emited
+ruler_new_instance -> commander_new_instance : session_data emited
+commander_new_instance -> command : once I got the emission of user_data_stored that matchs user_data now I look the past stored session_data emited, pop it and send to you! Thats it: session_data
+@enduml

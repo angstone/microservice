@@ -1,0 +1,21 @@
+@startuml
+title Network Schema For Angstone
+actor "client"
+box "nats"
+boundary restportal
+participant auth << (A,#ADD1B2) >>
+participant microservice << (M,#ADD1B2) >>
+end box
+== Read Operations ==
+client -> restportal : get (read operation)
+restportal -> auth : who is client?
+auth -> restportal : auth information(fulano)
+restportal -> microservice : get data for (fulano)
+microservice -> restportal : data for (fulano)
+restportal -> client : data for (fulano)
+== Actions ==
+client -> restportal : post (action)
+restportal -> microservice : action command from fulano
+microservice -> restportal : response to fulano
+restportal -> client : response to fulano
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+title The Title
+actor Foo1
+box "A Box Title" #LightBlue
+boundary Foo2
+control Foo3
+end box
+entity Foo4
+database Foo5
+participant Foo6 as Foo6 << Generated >>
+participant Foo7 << (F,#ADD1B2) >>
+Foo1 -> Foo2 : To boundary
+Foo1 -> Foo3 : To control
+activate Foo3
+deactivate Foo3
+Foo1 -> Foo4 : To entity
+note left
+  a note
+  on several lines
+end note
+== More Features ==
+Foo1 -> Foo5 : To database
+Foo1 -> Foo6
+Foo1 -> Foo1 : To self
+||45||
+alt successful case
+Foo1 -> Foo2: Successful condition
+else some kind of failure
+Foo1 -> Foo4: Failed condition
+end
+@enduml

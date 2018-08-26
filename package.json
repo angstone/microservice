@@ -1,18 +1,10 @@
 {
   "name": "@angstone/microservice",
-  "version": "0.0.15",
-  "description": "Default microservice package for angstone services.",
+  "version": "0.0.17",
+  "description": "DEPRECATED Moved to @angstone/micro",
   "main": "index.js",
   "scripts": {
-    "start": "cd test/test-full-stack && docker-compose up",
-    "clear": "./scripts/docker-remove.sh test*",
-    "reborn-full-stack": "./scripts/docker-reborn.sh test* test/test-full-stack",
-    "reborn-auth": "./scripts/docker-reborn.sh test* test/test-auth",
-    "reborn": "./scripts/docker-reborn.sh test* test/test-full-stack",
-    "test-auth": "cd test/test-auth && docker-compose up",
-    "test-full-stack": "cd test/test-full-stack && docker-compose up",
-    "test": "cd test/test-full-stack && docker-compose up",
-    "solve-enosp": "./scripts/solve-esp.sh"
+    "test": "nyc mocha -b -r \"./test/bootstrap\" -t 10000 --exit \"./test/*.spec.js\""
   },
   "repository": {
     "type": "git",
@@ -22,8 +14,10 @@
     "microservice",
     "hemera",
     "eventstore",
-    "elasticsearch",
-    "backend"
+    "framework",
+    "backend",
+    "eventsourced",
+    "events"
   ],
   "author": "SS Ribeiro <luan@ssribeiro.com>",
   "license": "MIT",
@@ -36,13 +30,24 @@
     "npm": "~5.5.1"
   },
   "dependencies": {
-    "app-root-path": "^2.0.0",
-    "event-store-client": "^1.0.0",
-    "forever": "^0.15.3",
-    "mongoose": "^5.1.1",
+    "@moebius/http-graceful-shutdown": "^1.1.0",
+    "bunyan": "^1.8.12",
+    "circular-json": "^0.5.5",
+    "cycle": "^1.0.3",
     "nats": "^0.8.10",
-    "nats-hemera": "^5.4.7",
+    "nats-hemera": "^5.8.6",
     "node-fetch": "^2.1.2",
-    "uuid": "^3.2.1"
+    "taffy": "^2.6.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "chai-things": "^0.2.0",
+    "code": "^5.2.0",
+    "hemera-plugin": "^1.3.0",
+    "hemera-testsuite": "^4.1.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.1.3"
   }
 }

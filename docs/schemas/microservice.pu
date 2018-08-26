@@ -1,0 +1,56 @@
+@startuml
+title Microservice For Angstone
+boundary restportal
+box "microservice"
+participant index << (I,#ADD1B2) >>
+control rules << (B,#ADD1B2) >>
+participant reducer << (R,#ADD1B2) >>
+entity model << (M,#ADD1B2) >>
+database inMemoryOrm << (D,#ADD1B2) >>
+end box
+database eventstore
+== Read Operations ==
+restportal -> index : get data for (fulano)
+index -> rules : can (fulano) read this?
+rules -> model : what is this?
+model -> inMemoryOrm : help me remember about this
+inMemoryOrm -> model : data
+model -> rules : this is it
+alt yes he can
+rules -> index: yes and this is it:(data)
+index -> restportal: data
+else no he can't
+rules -> index: due to some rule brake
+index -> restportal: unauthorized error: rule broke
+end
+== Actions ==
+restportal -> index : do action from (fulano)
+index -> rules : can (fulano) do this?
+rules -> model : what is this?
+model -> inMemoryOrm : help me remember about this
+inMemoryOrm -> model : data
+model -> rules : this is it
+alt yes he can
+rules -> index: yes he can
+index -> eventstore: action done by (fulano)
+eventstore -> index : event confirmed
+eventstore -> reducer : got event
+reducer -> model : what is the state?
+model -> inMemoryOrm : help me to remember my state?
+inMemoryOrm -> model : this is the state
+model -> reducer : state
+reducer -> model : new state
+model -> inMemoryOrm : remember this new state!
+reducer -> index : i am up to date with events
+index -> rules: whats is the result of the action?
+rules -> model : what is this?
+model -> inMemoryOrm : help me remember about this
+inMemoryOrm -> model : data
+model -> rules : this is it
+rules -> index : that is the data result
+index -> restportal : data
+else no he can't
+rules -> index: due to some rule brake
+index -> restportal: unauthorized error: rule broke
+end
+@enduml
