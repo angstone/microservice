@@ -1,3 +1,6 @@
+# DEPRECATED
+This is no longer supported, please consider using @angstone/micro instead.
+
 # @angstone/microservice
 
 Default microservice package for angstone services.
